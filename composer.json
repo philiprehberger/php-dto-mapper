@@ -1,0 +1,35 @@
+{
+    "name": "philiprehberger/php-dto-mapper",
+    "description": "Map arrays and JSON to strongly-typed DTOs with attribute-driven configuration",
+    "keywords": ["dto", "mapper", "data-transfer", "hydration", "casting"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Philip Rehberger",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.2"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.0",
+        "phpstan/phpstan": "^1.12|^2.0",
+        "phpunit/phpunit": "^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "PhilipRehberger\\DtoMapper\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PhilipRehberger\\DtoMapper\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
