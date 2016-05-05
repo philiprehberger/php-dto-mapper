@@ -2,7 +2,6 @@
 
 [![Tests](https://github.com/philiprehberger/php-dto-mapper/actions/workflows/tests.yml/badge.svg)](https://github.com/philiprehberger/php-dto-mapper/actions/workflows/tests.yml)
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/philiprehberger/php-dto-mapper.svg)](https://packagist.org/packages/philiprehberger/php-dto-mapper)
-[![Total Downloads](https://img.shields.io/packagist/dt/philiprehberger/php-dto-mapper.svg)](https://packagist.org/packages/philiprehberger/php-dto-mapper)
 [![PHP Version Require](https://img.shields.io/packagist/php-v/philiprehberger/php-dto-mapper.svg)](https://packagist.org/packages/philiprehberger/php-dto-mapper)
 [![License](https://img.shields.io/github/license/philiprehberger/php-dto-mapper)](LICENSE)
 
