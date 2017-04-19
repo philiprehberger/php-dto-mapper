@@ -1,7 +1,9 @@
 {
     "name": "philiprehberger/php-dto-mapper",
     "description": "Map arrays and JSON to strongly-typed DTOs with attribute-driven configuration",
+    "type": "library",
     "keywords": ["dto", "mapper", "data-transfer", "hydration", "casting"],
+    "homepage": "https://github.com/philiprehberger/php-dto-mapper",
     "license": "MIT",
     "authors": [
         {
@@ -29,6 +31,11 @@
     },
     "config": {
         "sort-packages": true
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "lint": "vendor/bin/pint",
+        "analyse": "vendor/bin/phpstan analyse"
     },
     "minimum-stability": "dev",
     "prefer-stable": true
