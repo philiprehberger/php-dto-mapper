@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-03-22
+
+### Added
+- `DtoMapper::mapPartial()` for mapping without requiring all fields
+- Union type support in `TypeCoercer` via `ReflectionUnionType`
+
 ## [1.0.3] - 2026-03-17
 
 ### Changed

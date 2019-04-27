@@ -11,6 +11,7 @@ use PhilipRehberger\DtoMapper\Contracts\Caster;
 use ReflectionClass;
 use ReflectionNamedType;
 use ReflectionProperty;
+use ReflectionUnionType;
 
 /**
  * Resolves class properties, their attributes, and type information via Reflection.
@@ -31,6 +32,7 @@ class PropertyResolver
      *     hasDefault: bool,
      *     default: mixed,
      *     isBuiltin: bool,
+     *     unionTypes: array<array{typeName: string, isBuiltin: bool}>|null,
      * }>
      */
     public static function resolve(string $class): array
@@ -90,11 +92,34 @@ class PropertyResolver
 
             // Resolve type information
             $type = $property->getType();
+            $unionTypes = null;
 
             if ($type instanceof ReflectionNamedType) {
                 $typeName = $type->getName();
                 $nullable = $type->allowsNull();
                 $isBuiltin = $type->isBuiltin();
+            } elseif ($type instanceof ReflectionUnionType) {
+                $nullable = $type->allowsNull();
+                $unionTypes = [];
+
+                foreach ($type->getTypes() as $unionMember) {
+                    if ($unionMember instanceof ReflectionNamedType) {
+                        if ($unionMember->getName() === 'null') {
+                            continue;
+                        }
+
+                        $unionTypes[] = [
+                            'typeName' => $unionMember->getName(),
+                            'isBuiltin' => $unionMember->isBuiltin(),
+                        ];
+                    }
+                }
+
+                // Use the first non-null type as the primary type
+                if (count($unionTypes) > 0) {
+                    $typeName = $unionTypes[0]['typeName'];
+                    $isBuiltin = $unionTypes[0]['isBuiltin'];
+                }
             }
 
             $resolved[$name] = [
@@ -107,6 +132,7 @@ class PropertyResolver
                 'hasDefault' => $hasDefault,
                 'default' => $default,
                 'isBuiltin' => $isBuiltin,
+                'unionTypes' => $unionTypes,
             ];
         }
 
