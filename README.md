@@ -3,6 +3,7 @@
 [![Tests](https://github.com/philiprehberger/php-dto-mapper/actions/workflows/tests.yml/badge.svg)](https://github.com/philiprehberger/php-dto-mapper/actions/workflows/tests.yml)
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/philiprehberger/php-dto-mapper.svg)](https://packagist.org/packages/philiprehberger/php-dto-mapper)
 [![License](https://img.shields.io/github/license/philiprehberger/php-dto-mapper)](LICENSE)
+[![Sponsor](https://img.shields.io/badge/sponsor-GitHub%20Sponsors-ec6cb9)](https://github.com/sponsors/philiprehberger)
 
 Map arrays and JSON to strongly-typed DTOs with attribute-driven configuration.
 
