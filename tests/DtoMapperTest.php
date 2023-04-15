@@ -9,8 +9,10 @@ use PhilipRehberger\DtoMapper\DtoMapper;
 use PhilipRehberger\DtoMapper\Exceptions\MappingException;
 use PhilipRehberger\DtoMapper\Tests\Fixtures\AllDefaultsDto;
 use PhilipRehberger\DtoMapper\Tests\Fixtures\CoercionDto;
+use PhilipRehberger\DtoMapper\Tests\Fixtures\CollectionDto;
 use PhilipRehberger\DtoMapper\Tests\Fixtures\DateDto;
 use PhilipRehberger\DtoMapper\Tests\Fixtures\DeeplyNestedDto;
+use PhilipRehberger\DtoMapper\Tests\Fixtures\DotNotationDto;
 use PhilipRehberger\DtoMapper\Tests\Fixtures\EnumDto;
 use PhilipRehberger\DtoMapper\Tests\Fixtures\MappedDto;
 use PhilipRehberger\DtoMapper\Tests\Fixtures\NestedDto;
@@ -334,5 +336,121 @@ class DtoMapperTest extends TestCase
 
         // Value is already a string, which matches the union — kept as-is
         $this->assertSame('99', $dto->identifier);
+    }
+
+    public function test_strict_with_valid_data(): void
+    {
+        $dto = DtoMapper::strict([
+            'name' => 'Alice',
+            'age' => 30,
+            'email' => 'alice@example.com',
+        ], SimpleDto::class);
+
+        $this->assertInstanceOf(SimpleDto::class, $dto);
+        $this->assertSame('Alice', $dto->name);
+        $this->assertSame(30, $dto->age);
+        $this->assertSame('alice@example.com', $dto->email);
+    }
+
+    public function test_strict_with_extra_keys_throws(): void
+    {
+        $this->expectException(MappingException::class);
+
+        DtoMapper::strict([
+            'name' => 'Alice',
+            'age' => 30,
+            'email' => 'alice@example.com',
+            'unknown_field' => 'oops',
+            'typo_name' => 'bad',
+        ], SimpleDto::class);
+    }
+
+    public function test_strict_exception_lists_unknown_fields(): void
+    {
+        try {
+            DtoMapper::strict([
+                'name' => 'Alice',
+                'age' => 30,
+                'email' => 'alice@example.com',
+                'unknown_field' => 'oops',
+            ], SimpleDto::class);
+
+            $this->fail('Expected MappingException was not thrown.');
+        } catch (MappingException $e) {
+            $this->assertCount(1, $e->errors);
+            $this->assertStringContainsString('unknown_field', $e->errors[0]);
+        }
+    }
+
+    public function test_strict_with_map_from_alias(): void
+    {
+        $dto = DtoMapper::strict([
+            'full_name' => 'Jane Doe',
+            'user_email' => 'jane@example.com',
+        ], MappedDto::class);
+
+        $this->assertSame('Jane Doe', $dto->name);
+        $this->assertSame('jane@example.com', $dto->email);
+    }
+
+    public function test_collection_caster(): void
+    {
+        $dto = DtoMapper::map([
+            'name' => 'Order #1',
+            'items' => [
+                ['name' => 'Widget', 'age' => 1, 'email' => 'w@example.com'],
+                ['name' => 'Gadget', 'age' => 2, 'email' => 'g@example.com'],
+                ['name' => 'Doohickey', 'age' => 3, 'email' => 'd@example.com'],
+            ],
+        ], CollectionDto::class);
+
+        $this->assertSame('Order #1', $dto->name);
+        $this->assertCount(3, $dto->items);
+        $this->assertInstanceOf(SimpleDto::class, $dto->items[0]);
+        $this->assertSame('Widget', $dto->items[0]->name);
+        $this->assertSame(1, $dto->items[0]->age);
+        $this->assertSame('Gadget', $dto->items[1]->name);
+        $this->assertSame('Doohickey', $dto->items[2]->name);
+    }
+
+    public function test_collection_caster_with_empty_array(): void
+    {
+        $dto = DtoMapper::map([
+            'name' => 'Empty Order',
+            'items' => [],
+        ], CollectionDto::class);
+
+        $this->assertSame('Empty Order', $dto->name);
+        $this->assertCount(0, $dto->items);
+    }
+
+    public function test_dot_notation_map_from(): void
+    {
+        $dto = DtoMapper::map([
+            'name' => 'Alice',
+            'user' => [
+                'profile' => [
+                    'email' => 'alice@example.com',
+                ],
+                'age' => 28,
+            ],
+        ], DotNotationDto::class);
+
+        $this->assertSame('Alice', $dto->name);
+        $this->assertSame('alice@example.com', $dto->email);
+        $this->assertSame(28, $dto->age);
+    }
+
+    public function test_dot_notation_missing_nested_key_throws(): void
+    {
+        $this->expectException(MappingException::class);
+
+        DtoMapper::map([
+            'name' => 'Alice',
+            'user' => [
+                'profile' => [],
+                'age' => 28,
+            ],
+        ], DotNotationDto::class);
     }
 }

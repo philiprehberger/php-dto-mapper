@@ -34,7 +34,7 @@ class DtoMapper
 
         foreach ($resolved as $name => $meta) {
             $sourceKey = $meta['sourceKey'];
-            $hasKey = array_key_exists($sourceKey, $data);
+            $hasKey = self::hasNestedKey($data, $sourceKey);
 
             if (! $hasKey) {
                 if ($meta['optional'] || $meta['hasDefault']) {
@@ -54,7 +54,7 @@ class DtoMapper
                 continue;
             }
 
-            $value = $data[$sourceKey];
+            $value = self::getNestedValue($data, $sourceKey);
 
             try {
                 $values[$name] = self::resolveValue($value, $meta);
@@ -68,6 +68,48 @@ class DtoMapper
         }
 
         return self::instantiate($reflection, $resolved, $values);
+    }
+
+    /**
+     * Map an associative array to a DTO, rejecting unknown source keys.
+     *
+     * @template T of object
+     *
+     * @param  array<string, mixed>  $data
+     * @param  class-string<T>  $class
+     * @return T
+     *
+     * @throws MappingException
+     */
+    public static function strict(array $data, string $class): object
+    {
+        $resolved = PropertyResolver::resolve($class);
+        $validKeys = [];
+
+        foreach ($resolved as $meta) {
+            $sourceKey = $meta['sourceKey'];
+
+            // For dot-notation keys, only the top-level segment is a valid root key
+            if (str_contains($sourceKey, '.')) {
+                $validKeys[] = explode('.', $sourceKey, 2)[0];
+            } else {
+                $validKeys[] = $sourceKey;
+            }
+        }
+
+        $validKeys = array_unique($validKeys);
+        $unknownKeys = array_diff(array_keys($data), $validKeys);
+
+        if (count($unknownKeys) > 0) {
+            $errors = array_map(
+                fn (string $key): string => sprintf('Unknown field "%s".', $key),
+                array_values($unknownKeys),
+            );
+
+            throw new MappingException($errors);
+        }
+
+        return self::map($data, $class);
     }
 
     /**
@@ -140,7 +182,7 @@ class DtoMapper
 
         foreach ($resolved as $name => $meta) {
             $sourceKey = $meta['sourceKey'];
-            $hasKey = array_key_exists($sourceKey, $data);
+            $hasKey = self::hasNestedKey($data, $sourceKey);
 
             if (! $hasKey) {
                 if ($meta['hasDefault']) {
@@ -161,7 +203,7 @@ class DtoMapper
                 continue;
             }
 
-            $value = $data[$sourceKey];
+            $value = self::getNestedValue($data, $sourceKey);
 
             try {
                 $values[$name] = self::resolveValue($value, $meta);
@@ -369,5 +411,55 @@ class DtoMapper
         }
 
         return $instance;
+    }
+
+    /**
+     * Check if a key exists in the data, supporting dot-notation for nested access.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    private static function hasNestedKey(array $data, string $key): bool
+    {
+        if (! str_contains($key, '.')) {
+            return array_key_exists($key, $data);
+        }
+
+        $segments = explode('.', $key);
+        $current = $data;
+
+        foreach ($segments as $segment) {
+            if (! is_array($current) || ! array_key_exists($segment, $current)) {
+                return false;
+            }
+
+            $current = $current[$segment];
+        }
+
+        return true;
+    }
+
+    /**
+     * Get a value from the data using dot-notation for nested access.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    private static function getNestedValue(array $data, string $key): mixed
+    {
+        if (! str_contains($key, '.')) {
+            return $data[$key];
+        }
+
+        $segments = explode('.', $key);
+        $current = $data;
+
+        foreach ($segments as $segment) {
+            if (! is_array($current) || ! array_key_exists($segment, $current)) {
+                return null;
+            }
+
+            $current = $current[$segment];
+        }
+
+        return $current;
     }
 }

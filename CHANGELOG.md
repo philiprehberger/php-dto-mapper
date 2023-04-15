@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-03-27
+
+### Added
+- `DtoMapper::strict()` for rejecting unknown source keys
+- `CollectionCaster` for mapping arrays of items to typed DTO arrays
+- Dot-notation support in `#[MapFrom]` for nested source data access
+
 ## [1.1.1] - 2026-03-23
 
 ### Changed

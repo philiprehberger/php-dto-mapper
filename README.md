@@ -1,8 +1,12 @@
 # PHP DTO Mapper
 
 [![Tests](https://github.com/philiprehberger/php-dto-mapper/actions/workflows/tests.yml/badge.svg)](https://github.com/philiprehberger/php-dto-mapper/actions/workflows/tests.yml)
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/philiprehberger/php-dto-mapper.svg)](https://packagist.org/packages/philiprehberger/php-dto-mapper)
+[![Packagist Version](https://img.shields.io/packagist/v/philiprehberger/php-dto-mapper.svg)](https://packagist.org/packages/philiprehberger/php-dto-mapper)
+[![GitHub Release](https://img.shields.io/github/v/release/philiprehberger/php-dto-mapper)](https://github.com/philiprehberger/php-dto-mapper/releases)
+[![Last Updated](https://img.shields.io/github/last-commit/philiprehberger/php-dto-mapper)](https://github.com/philiprehberger/php-dto-mapper/commits/main)
 [![License](https://img.shields.io/github/license/philiprehberger/php-dto-mapper)](LICENSE)
+[![Bug Reports](https://img.shields.io/github/issues/philiprehberger/php-dto-mapper/bug)](https://github.com/philiprehberger/php-dto-mapper/issues?q=label%3Abug)
+[![Feature Requests](https://img.shields.io/github/issues/philiprehberger/php-dto-mapper/enhancement)](https://github.com/philiprehberger/php-dto-mapper/issues?q=label%3Aenhancement)
 [![Sponsor](https://img.shields.io/badge/sponsor-GitHub%20Sponsors-ec6cb9)](https://github.com/sponsors/philiprehberger)
 
 Map arrays and JSON to strongly-typed DTOs with attribute-driven configuration.
@@ -78,6 +82,24 @@ $dtos = DtoMapper::mapCollection([
 $dto = DtoMapper::tryMap($data, UserDto::class); // Returns null on failure
 ```
 
+### Strict mapping
+
+Reject unknown source keys to catch API contract violations and typos:
+
+```php
+$dto = DtoMapper::strict([
+    'name' => 'John',
+    'email_address' => 'john@example.com',
+], UserDto::class);
+
+// Throws MappingException: Unknown field "extra_key"
+DtoMapper::strict([
+    'name' => 'John',
+    'email_address' => 'john@example.com',
+    'extra_key' => 'oops',
+], UserDto::class);
+```
+
 ### Nested DTOs
 
 ```php
@@ -103,6 +125,30 @@ $dto = DtoMapper::map([
 ], PersonDto::class);
 
 $dto->address->city; // 'Springfield'
+```
+
+### Dot-notation access
+
+Access nested source data with dot-notation in `#[MapFrom]`:
+
+```php
+class ProfileDto
+{
+    public function __construct(
+        public readonly string $name,
+        #[MapFrom('user.profile.email')]
+        public readonly string $email,
+    ) {}
+}
+
+$dto = DtoMapper::map([
+    'name' => 'Alice',
+    'user' => [
+        'profile' => ['email' => 'alice@example.com'],
+    ],
+], ProfileDto::class);
+
+$dto->email; // 'alice@example.com'
 ```
 
 ### Partial mapping
@@ -178,6 +224,42 @@ class OrderDto
 }
 ```
 
+### Collection caster
+
+Map arrays of items to typed DTO arrays:
+
+```php
+use PhilipRehberger\DtoMapper\Attributes\CastWith;
+use PhilipRehberger\DtoMapper\Casters\CollectionCaster;
+
+class ItemDto
+{
+    public function __construct(
+        public readonly string $name,
+        public readonly int $quantity,
+    ) {}
+}
+
+class OrderDto
+{
+    public function __construct(
+        public readonly string $orderId,
+        #[CastWith(CollectionCaster::class, args: [ItemDto::class])]
+        public readonly array $items,
+    ) {}
+}
+
+$dto = DtoMapper::map([
+    'orderId' => 'ORD-001',
+    'items' => [
+        ['name' => 'Widget', 'quantity' => 3],
+        ['name' => 'Gadget', 'quantity' => 1],
+    ],
+], OrderDto::class);
+
+$dto->items[0]->name; // 'Widget'
+```
+
 ### Enum casting
 
 ```php
@@ -205,6 +287,7 @@ class AccountDto
 | Method | Description |
 |--------|-------------|
 | `DtoMapper::map(array $data, string $class): object` | Map an associative array to a DTO |
+| `DtoMapper::strict(array $data, string $class): object` | Map with unknown key rejection |
 | `DtoMapper::mapJson(string $json, string $class): object` | Map a JSON string to a DTO |
 | `DtoMapper::mapPartial(array $data, string $class): object` | Map without requiring all fields |
 | `DtoMapper::mapCollection(array $items, string $class): array` | Map an array of arrays to DTOs |
@@ -214,7 +297,7 @@ class AccountDto
 
 | Attribute | Target | Description |
 |-----------|--------|-------------|
-| `#[MapFrom('key')]` | Property | Map from a different source key |
+| `#[MapFrom('key')]` | Property | Map from a different source key (supports dot-notation) |
 | `#[Optional]` | Property | Allow missing keys, use default value |
 | `#[CastWith(Caster::class)]` | Property | Apply a custom caster |
 
@@ -224,6 +307,7 @@ class AccountDto
 |--------|-------------|
 | `DateTimeCaster` | Casts string to `DateTimeImmutable` |
 | `EnumCaster` | Casts string/int to a backed enum |
+| `CollectionCaster` | Casts array of arrays to array of DTOs |
 
 ## Development
 
@@ -231,9 +315,13 @@ class AccountDto
 composer install
 vendor/bin/phpunit
 vendor/bin/pint --test
-vendor/bin/phpstan analyse
 ```
+
+## Support
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Philip%20Rehberger-blue?logo=linkedin)](https://www.linkedin.com/in/philiprehberger/)
+[![Packages](https://img.shields.io/badge/All%20Packages-philiprehberger.com-blue)](https://philiprehberger.com)
 
 ## License
 
-MIT
+[MIT](LICENSE)
