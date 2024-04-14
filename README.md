@@ -1,13 +1,8 @@
 # PHP DTO Mapper
 
 [![Tests](https://github.com/philiprehberger/php-dto-mapper/actions/workflows/tests.yml/badge.svg)](https://github.com/philiprehberger/php-dto-mapper/actions/workflows/tests.yml)
-[![Packagist Version](https://img.shields.io/packagist/v/philiprehberger/php-dto-mapper.svg)](https://packagist.org/packages/philiprehberger/php-dto-mapper)
-[![GitHub Release](https://img.shields.io/github/v/release/philiprehberger/php-dto-mapper)](https://github.com/philiprehberger/php-dto-mapper/releases)
-[![Last Updated](https://img.shields.io/github/last-commit/philiprehberger/php-dto-mapper)](https://github.com/philiprehberger/php-dto-mapper/commits/main)
-[![License](https://img.shields.io/github/license/philiprehberger/php-dto-mapper)](LICENSE)
-[![Bug Reports](https://img.shields.io/github/issues/philiprehberger/php-dto-mapper/bug)](https://github.com/philiprehberger/php-dto-mapper/issues?q=label%3Abug)
-[![Feature Requests](https://img.shields.io/github/issues/philiprehberger/php-dto-mapper/enhancement)](https://github.com/philiprehberger/php-dto-mapper/issues?q=label%3Aenhancement)
-[![Sponsor](https://img.shields.io/badge/sponsor-GitHub%20Sponsors-ec6cb9)](https://github.com/sponsors/philiprehberger)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/philiprehberger/php-dto-mapper.svg)](https://packagist.org/packages/philiprehberger/php-dto-mapper)
+[![Last updated](https://img.shields.io/github/last-commit/philiprehberger/php-dto-mapper)](https://github.com/philiprehberger/php-dto-mapper/commits/main)
 
 Map arrays and JSON to strongly-typed DTOs with attribute-driven configuration.
 
@@ -319,8 +314,21 @@ vendor/bin/pint --test
 
 ## Support
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Philip%20Rehberger-blue?logo=linkedin)](https://www.linkedin.com/in/philiprehberger/)
-[![Packages](https://img.shields.io/badge/All%20Packages-philiprehberger.com-blue)](https://philiprehberger.com)
+If you find this project useful:
+
+⭐ [Star the repo](https://github.com/philiprehberger/php-dto-mapper)
+
+🐛 [Report issues](https://github.com/philiprehberger/php-dto-mapper/issues?q=is%3Aissue+is%3Aopen+label%3Abug)
+
+💡 [Suggest features](https://github.com/philiprehberger/php-dto-mapper/issues?q=is%3Aissue+is%3Aopen+label%3Aenhancement)
+
+❤️ [Sponsor development](https://github.com/sponsors/philiprehberger)
+
+🌐 [All Open Source Projects](https://philiprehberger.com/open-source-packages)
+
+💻 [GitHub Profile](https://github.com/philiprehberger)
+
+🔗 [LinkedIn Profile](https://www.linkedin.com/in/philiprehberger)
 
 ## License
 
