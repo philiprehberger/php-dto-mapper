@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace PhilipRehberger\DtoMapper;
 
+use JsonException;
 use PhilipRehberger\DtoMapper\Exceptions\MappingException;
 use ReflectionClass;
+use Throwable;
 
 /**
  * Map arrays and JSON to strongly-typed DTOs with attribute-driven configuration.
@@ -56,7 +58,7 @@ class DtoMapper
 
             try {
                 $values[$name] = self::resolveValue($value, $meta);
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $errors[] = sprintf('Field "%s": %s', $sourceKey, $e->getMessage());
             }
         }
@@ -82,7 +84,7 @@ class DtoMapper
     {
         try {
             $data = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
-        } catch (\JsonException $e) {
+        } catch (JsonException $e) {
             throw new MappingException(
                 [sprintf('Invalid JSON: %s', $e->getMessage())],
             );
@@ -177,7 +179,7 @@ class DtoMapper
      * @param  array<string, mixed>  $values
      * @return T
      */
-    private static function instantiate(\ReflectionClass $reflection, array $resolved, array $values): object
+    private static function instantiate(ReflectionClass $reflection, array $resolved, array $values): object
     {
         $constructor = $reflection->getConstructor();
 
