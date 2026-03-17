@@ -2,7 +2,6 @@
 
 [![Tests](https://github.com/philiprehberger/php-dto-mapper/actions/workflows/tests.yml/badge.svg)](https://github.com/philiprehberger/php-dto-mapper/actions/workflows/tests.yml)
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/philiprehberger/php-dto-mapper.svg)](https://packagist.org/packages/philiprehberger/php-dto-mapper)
-[![PHP Version Require](https://img.shields.io/packagist/php-v/philiprehberger/php-dto-mapper.svg)](https://packagist.org/packages/philiprehberger/php-dto-mapper)
 [![License](https://img.shields.io/github/license/philiprehberger/php-dto-mapper)](LICENSE)
 
 Map arrays and JSON to strongly-typed DTOs with attribute-driven configuration.
@@ -193,33 +192,15 @@ class AccountDto
 
 ---
 
-## Testing
+## Development
 
 ```bash
 composer install
 vendor/bin/phpunit
-```
-
-Code style:
-
-```bash
-vendor/bin/pint
-```
-
-Static analysis:
-
-```bash
+vendor/bin/pint --test
 vendor/bin/phpstan analyse
 ```
 
----
-
-## Changelog
-
-Please see [CHANGELOG.md](CHANGELOG.md) for recent changes.
-
----
-
 ## License
 
-The MIT License (MIT). Please see [LICENSE](LICENSE) for more information.
+MIT
