@@ -10,6 +10,47 @@ namespace PhilipRehberger\DtoMapper;
 class TypeCoercer
 {
     /**
+     * Coerce a value to the first matching type in a union.
+     *
+     * @param  array<array{typeName: string, isBuiltin: bool}>  $unionTypes
+     */
+    public static function coerceUnion(mixed $value, array $unionTypes): mixed
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        // First, check if the value already matches one of the types natively
+        $nativeType = get_debug_type($value);
+
+        foreach ($unionTypes as $type) {
+            if ($type['isBuiltin'] && $nativeType === $type['typeName']) {
+                return $value;
+            }
+        }
+
+        // Try coercing to each type in declaration order
+        foreach ($unionTypes as $type) {
+            if (! $type['isBuiltin']) {
+                continue;
+            }
+
+            try {
+                $coerced = self::coerce($value, $type['typeName']);
+                $actualType = get_debug_type($coerced);
+
+                if ($actualType === $type['typeName']) {
+                    return $coerced;
+                }
+            } catch (\Throwable) {
+                continue;
+            }
+        }
+
+        return $value;
+    }
+
+    /**
      * Coerce a value to the specified type name.
      */
     public static function coerce(mixed $value, string $typeName): mixed

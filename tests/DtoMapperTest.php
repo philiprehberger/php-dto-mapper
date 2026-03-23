@@ -15,8 +15,10 @@ use PhilipRehberger\DtoMapper\Tests\Fixtures\EnumDto;
 use PhilipRehberger\DtoMapper\Tests\Fixtures\MappedDto;
 use PhilipRehberger\DtoMapper\Tests\Fixtures\NestedDto;
 use PhilipRehberger\DtoMapper\Tests\Fixtures\OptionalDto;
+use PhilipRehberger\DtoMapper\Tests\Fixtures\PartialDto;
 use PhilipRehberger\DtoMapper\Tests\Fixtures\SimpleDto;
 use PhilipRehberger\DtoMapper\Tests\Fixtures\Status;
+use PhilipRehberger\DtoMapper\Tests\Fixtures\UnionDto;
 use PHPUnit\Framework\TestCase;
 
 class DtoMapperTest extends TestCase
@@ -262,5 +264,75 @@ class DtoMapperTest extends TestCase
         $this->assertSame('default', $dto->name);
         $this->assertSame(0, $dto->count);
         $this->assertFalse($dto->enabled);
+    }
+
+    public function test_map_partial_with_incomplete_data(): void
+    {
+        $dto = DtoMapper::mapPartial([
+            'name' => 'Alice',
+        ], PartialDto::class);
+
+        $this->assertSame('Alice', $dto->name);
+        $this->assertNull($dto->email);
+        $this->assertSame('user', $dto->role);
+    }
+
+    public function test_map_partial_nullable_properties_get_null(): void
+    {
+        $dto = DtoMapper::mapPartial([
+            'name' => 'Bob',
+            'age' => 25,
+        ], PartialDto::class);
+
+        $this->assertSame('Bob', $dto->name);
+        $this->assertSame(25, $dto->age);
+        $this->assertNull($dto->email);
+        $this->assertSame('user', $dto->role);
+    }
+
+    public function test_map_partial_with_all_fields(): void
+    {
+        $dto = DtoMapper::mapPartial([
+            'name' => 'Charlie',
+            'age' => 30,
+            'email' => 'charlie@example.com',
+            'role' => 'admin',
+        ], PartialDto::class);
+
+        $this->assertSame('Charlie', $dto->name);
+        $this->assertSame(30, $dto->age);
+        $this->assertSame('charlie@example.com', $dto->email);
+        $this->assertSame('admin', $dto->role);
+    }
+
+    public function test_union_type_coercion_int_value(): void
+    {
+        $dto = DtoMapper::map([
+            'name' => 'Alice',
+            'identifier' => 42,
+        ], UnionDto::class);
+
+        $this->assertSame(42, $dto->identifier);
+    }
+
+    public function test_union_type_coercion_string_value(): void
+    {
+        $dto = DtoMapper::map([
+            'name' => 'Bob',
+            'identifier' => 'abc-123',
+        ], UnionDto::class);
+
+        $this->assertSame('abc-123', $dto->identifier);
+    }
+
+    public function test_union_type_coercion_numeric_string_stays_string(): void
+    {
+        $dto = DtoMapper::map([
+            'name' => 'Charlie',
+            'identifier' => '99',
+        ], UnionDto::class);
+
+        // Value is already a string, which matches the union — kept as-is
+        $this->assertSame('99', $dto->identifier);
     }
 }

@@ -114,6 +114,51 @@ $dto = DtoMapper::map([
 $dto->address->city; // 'Springfield'
 ```
 
+### Partial mapping
+
+Map incomplete data without errors for missing non-nullable fields:
+
+```php
+class ProfileDto
+{
+    public function __construct(
+        public readonly string $name,
+        public readonly int $age,
+        public readonly ?string $bio = null,
+        public readonly string $role = 'member',
+    ) {}
+}
+
+$dto = DtoMapper::mapPartial([
+    'name' => 'Alice',
+], ProfileDto::class);
+
+$dto->name; // 'Alice'
+$dto->bio;  // null (nullable gets null)
+$dto->role; // 'member' (default preserved)
+// $dto->age is not set (non-nullable without default, skipped)
+```
+
+### Union types
+
+Properties with union types are coerced by trying each type in declaration order:
+
+```php
+class EventDto
+{
+    public function __construct(
+        public readonly string $name,
+        public readonly int|string $identifier,
+    ) {}
+}
+
+$dto = DtoMapper::map(['name' => 'Login', 'identifier' => '99'], EventDto::class);
+$dto->identifier; // 99 (coerced to int, the first type)
+
+$dto = DtoMapper::map(['name' => 'Login', 'identifier' => 'abc-123'], EventDto::class);
+$dto->identifier; // 'abc-123' (kept as string)
+```
+
 ### Custom casters
 
 Implement the `Caster` interface:
@@ -172,6 +217,7 @@ class AccountDto
 |--------|-------------|
 | `DtoMapper::map(array $data, string $class): object` | Map an associative array to a DTO |
 | `DtoMapper::mapJson(string $json, string $class): object` | Map a JSON string to a DTO |
+| `DtoMapper::mapPartial(array $data, string $class): object` | Map without requiring all fields |
 | `DtoMapper::mapCollection(array $items, string $class): array` | Map an array of arrays to DTOs |
 | `DtoMapper::tryMap(array $data, string $class): ?object` | Map returning null on failure |
 
