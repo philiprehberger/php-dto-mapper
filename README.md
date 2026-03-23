@@ -6,25 +6,15 @@
 
 Map arrays and JSON to strongly-typed DTOs with attribute-driven configuration.
 
----
-
 ## Requirements
 
-| Dependency | Version |
-|------------|---------|
-| PHP        | ^8.2    |
-
-Zero external dependencies.
-
----
+- PHP 8.2+
 
 ## Installation
 
 ```bash
 composer require philiprehberger/php-dto-mapper
 ```
-
----
 
 ## Usage
 
@@ -209,8 +199,6 @@ class AccountDto
 }
 ```
 
----
-
 ## API
 
 | Method | Description |
@@ -235,8 +223,6 @@ class AccountDto
 |--------|-------------|
 | `DateTimeCaster` | Casts string to `DateTimeImmutable` |
 | `EnumCaster` | Casts string/int to a backed enum |
-
----
 
 ## Development
 
